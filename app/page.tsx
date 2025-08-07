@@ -22,72 +22,18 @@ export default function PerfectCircleChallenge() {
   const [isFarcasterContext, setIsFarcasterContext] = useState(false)
 
   // Initialize Farcaster MiniApp SDK
+ 
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
-    const initMiniApp = async () => {
-      try {
-        console.log('Initializing Farcaster MiniApp SDK...')
-        // Wait for the app to be fully loaded and ready to display
-        await sdk.actions.ready()
-        console.log('MiniApp SDK ready() called successfully!')
-        setIsSDKReady(true)
-        setIsFarcasterContext(true)
-      } catch (error) {
-        console.error('Failed to initialize MiniApp SDK:', error)
-        // Fallback: still show the app even if SDK initialization fails
-      }
+    if (!loaded) {
+      setLoaded(true);
     }
+  }, []);
 
-    // Add a small delay to ensure the app is fully mounted
-    const timer = setTimeout(() => {
-      initMiniApp()
-    }, 100)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  // Secondary effect to ensure ready() is called after UI renders
   useEffect(() => {
-    if (!isSDKReady) {
-      const ensureReady = async () => {
-        try {
-          console.log('Secondary attempt to call MiniApp ready()...')
-          await sdk.actions.ready()
-          console.log('Secondary MiniApp SDK ready() successful!')
-          setIsSDKReady(true)
-          setIsFarcasterContext(true)
-        } catch (error) {
-          console.error('Secondary ready() call failed:', error)
-        }
-      }
-
-      // Call after a longer delay to ensure everything is rendered
-      const timer = setTimeout(ensureReady, 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [isSDKReady])
-
-  const handleDrawingStart = () => {
-    setIsDrawing(true)
-    setShowResults(false)
-    setAnalysis(null)
-    setShowInstructions(false)
-  }
-
-  const handleDrawingComplete = (points: Point[]) => {
-    if (points.length < 10) return // Need minimum points for analysis
-    
-    setIsDrawing(false)
-    setDrawnPoints(points)
-    
-    const circleAnalysis = analyzeCircle(points)
-    setAnalysis(circleAnalysis)
-    setShowResults(true)
-    setAttempts(prev => prev + 1)
-    
-    if (circleAnalysis.score > bestScore) {
-      setBestScore(circleAnalysis.score)
-    }
-  }
+    if (loaded) sdk.actions.ready();
+  }, [loaded]);
 
   const handleTryAgain = () => {
     setDrawnPoints([])
