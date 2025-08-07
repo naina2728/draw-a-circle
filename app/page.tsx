@@ -22,7 +22,17 @@ export default function PerfectCircleChallenge() {
   const [isFarcasterContext, setIsFarcasterContext] = useState(false)
 
   // Initialize Farcaster MiniApp SDK
+const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (loaded) sdk.actions.ready();
+  }, [loaded]);
     const initMiniApp = async () => {
       try {
         console.log('Initializing Farcaster MiniApp SDK...')
